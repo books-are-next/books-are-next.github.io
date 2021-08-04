@@ -34,7 +34,7 @@
 <script>
 fetch('https://api.github.com/orgs/books-are-next/repos?per_page=100').then(response => response.json()).then(async data => {
 
-    const info = await Promise.all(data.filter(repo => repo.name !== 'library').map(async repo => {
+    const info = await Promise.all(data.filter(repo => repo.name !== 'library' && repo.name !== 'books-are-next.github.io').map(async repo => {
         var book = null;
         const pagesLink = `https://books-are-next.github.io/${repo.name}/`;
 
