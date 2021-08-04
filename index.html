@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>List of books</title>
+
+    <style>
+        #content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-gap: 2rem;
+        }
+
+        h2, p {
+            margin: 0 0 0.25rem;
+        }
+
+        .repo {
+            border: 1px dashed blue;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .book {
+            border: 2px solid gray;
+        }
+    </style>
+</head>
+<body>
+    <h1>BooksAreNext repositories</h1>
+<div id="content">
+    <p>Loading…</p>
+</div>
+<script>
+fetch('https://api.github.com/orgs/books-are-next/repos?per_page=100').then(response => response.json()).then(async data => {
+
+    const info = await Promise.all(data.filter(repo => repo.name !== 'library').map(async repo => {
+        var book = null;
+        const pagesLink = `https://books-are-next.github.io/${repo.name}/`;
+
+        if (repo.has_pages) {
+            await fetch(pagesLink + 'manifest.json')
+                .then(resp => {
+                    if (resp.status === 200) return resp.json();
+                    else return null;
+                })
+                .then(manifest => {
+                    if (manifest) book = manifest
+                });
+        }
+
+        return `
+<div class="repo ${book ? 'book' : ''}">
+    <h2>${book ? `${book.author}: ${book.title}` : repo.name}</h2>
+    ${book ? `<p>books-are-next/${repo.name}</p>` : ''}
+    <p>
+        <a href="${repo.html_url}">repo</a> |
+        <a href="${repo.html_url}/actions">actions</a> |
+        ${repo.has_pages ? (book ? `<a href="${pagesLink}"">book</a>` : `<a href="${pagesLink}"">convertor</a>`) : `pages not set up (<a href="${repo.html_url}/settings/pages">settings</a>)`}
+    </p>
+</div>`;   
+    }));
+
+    document.getElementById('content').innerHTML = info.join('');
+})
+</script>
+</body>
+</html>
