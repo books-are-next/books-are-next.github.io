@@ -23,6 +23,7 @@
 
         .book {
             border: 2px solid gray;
+            background: #fafafa;
         }
     </style>
 </head>
@@ -33,7 +34,6 @@
 </div>
 <script>
 fetch('https://api.github.com/orgs/books-are-next/repos?per_page=100').then(response => response.json()).then(async data => {
-
     const info = await Promise.all(data.filter(repo => repo.name !== 'library' && repo.name !== 'books-are-next.github.io').map(async repo => {
         var book = null;
         var converter = null;
@@ -49,15 +49,18 @@ fetch('https://api.github.com/orgs/books-are-next/repos?per_page=100').then(resp
                     if (manifest) book = manifest
                 });
 
-            if (!book) await fetch(pagesLink)
+            await fetch(pagesLink + 'epub2nb-output/')
                 .then(resp => {
                     if (resp.status === 200) return true;
                     else return false;
                 })
                 .then(converterWorks => {
-                    if (converterWorks) converter = pagesLink
+                    if (converterWorks) converter = pagesLink + 'epub2nb-output/'
                 });
         }
+
+        const bookLink = repo.has_pages && book ? `<a href="${pagesLink}">book</a> |` : '';
+        const converterLink = repo.has_pages && converter ? `<a href="${converter}"">converter</a>` : '';
 
         return `
 <div class="repo ${book ? 'book' : ''}">
@@ -66,7 +69,9 @@ fetch('https://api.github.com/orgs/books-are-next/repos?per_page=100').then(resp
     <p>
         <a href="${repo.html_url}">repo</a> |
         <a href="${repo.html_url}/actions">actions</a> |
-        ${repo.has_pages ? (book ? `<a href="${pagesLink}">book</a>` : converter ? `<a href="${pagesLink}"">converter</a>` : `<b>error</b> see <a href="${repo.html_url}/actions">actions</a>`) : `pages not set up (<a href="${repo.html_url}/settings/pages">settings</a>)`}
+        ${repo.has_pages 
+            ? [bookLink, converterLink].filter(l => l !== null).join(' ') 
+            : `pages not set up in <a href="${repo.html_url}/settings/pages">settings</a>`}
     </p>
 </div>`;   
     }));
