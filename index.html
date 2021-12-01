@@ -63,7 +63,7 @@ fetch('https://api.github.com/orgs/books-are-next/repos?per_page=100').then(resp
 
         const repoLink = `<a href="${repo.html_url}">repo</a>`;
         const actionsLink = `<a href="${repo.html_url}/actions">actions</a>`;
-        const bookLink = repo.has_pages && book ? `<a href="${pagesLink}">book</a> |` : null;
+        const bookLink = repo.has_pages && book ? `<a href="${pagesLink}">book</a>` : null;
         const converterLink = repo.has_pages && converter ? `<a href="${converter}"">converter</a>` : null;
         const settingsLink = !repo.has_pages ? `pages not set up in <a href="${repo.html_url}/settings/pages">settings</a>` : null;
         const links = [repoLink, actionsLink, bookLink, converterLink, settingsLink].filter(l => l !== null).join(' | ');
