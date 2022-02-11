@@ -1,83 +1,91 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="utf-8">
-    <title>List of books</title>
+  <meta charset="utf-8">
+  <title>List of books</title>
+  <style>
+  #content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-gap: 2rem;
+  }
 
-    <style>
-        #content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            grid-gap: 2rem;
-        }
+  h2,
+  p {
+    margin: 0 0 0.25rem;
+  }
 
-        h2, p {
-            margin: 0 0 0.25rem;
-        }
+  .repo {
+    border: 1px dashed blue;
+    border-radius: 10px;
+    padding: 1rem;
+  }
 
-        .repo {
-            border: 1px dashed blue;
-            border-radius: 10px;
-            padding: 1rem;
-        }
-
-        .book {
-            border: 2px solid gray;
-            background: #fafafa;
-        }
-    </style>
+  .book {
+    border: 2px solid gray;
+    background: #fafafa;
+  }
+  </style>
 </head>
-<body>
-    <h1>BooksAreNext repositories</h1>
-<div id="content">
-    <p>Loading…</p>
-</div>
-<script>
-fetch('https://api.github.com/orgs/books-are-next/repos?per_page=100').then(response => response.json()).then(async data => {
-    const info = await Promise.all(
-        data.filter(repo => repo.name !== 'library' && repo.name !== 'books-are-next.github.io').map(async repo => {
-        var book = null;
-        var converter = null;
-        const pagesLink = `https://books-are-next.github.io/${repo.name}/`;
 
-        if (repo.has_pages) {
+<body>
+  <h1>BooksAreNext repositories</h1>
+  <div id="content">
+    <p>Loading…</p>
+  </div>
+  <script>
+  function loadPage(page) {
+    fetch(`https://api.github.com/orgs/books-are-next/repos?page=${page}&per_page=100`).then(response => response.json()).then(async data => {
+      const info = await Promise.all(
+        data.filter(repo => repo.name !== 'library' && repo.name !== 'books-are-next.github.io').map(async repo => {
+          var book = null;
+          var converter = null;
+          const pagesLink = `https://books-are-next.github.io/${repo.name}/`;
+
+          if (repo.has_pages) {
             await fetch(pagesLink + 'manifest.json')
-                .then(resp => {
-                    if (resp.status === 200) return resp.json();
-                    else return null;
-                })
-                .then(manifest => {
-                    if (manifest) book = manifest
-                });
+              .then(resp => {
+                if (resp.status === 200) return resp.json();
+                else return null;
+              })
+              .then(manifest => {
+                if (manifest) book = manifest
+              });
 
             await fetch(pagesLink + 'epub2nb-output/')
-                .then(resp => {
-                    if (resp.status === 200) return true;
-                    else return false;
-                })
-                .then(converterWorks => {
-                    if (converterWorks) converter = pagesLink + 'epub2nb-output/'
-                });
-        }
+              .then(resp => {
+                if (resp.status === 200) return true;
+                else return false;
+              })
+              .then(converterWorks => {
+                if (converterWorks) converter = pagesLink + 'epub2nb-output/'
+              });
+          }
 
 
-        const repoLink = `<a href="${repo.html_url}">repo</a>`;
-        const actionsLink = `<a href="${repo.html_url}/actions">actions</a>`;
-        const bookLink = repo.has_pages && book ? `<a href="${pagesLink}">book</a>` : null;
-        const converterLink = repo.has_pages && converter ? `<a href="${converter}"">converter</a>` : null;
-        const settingsLink = !repo.has_pages ? `pages not set up in <a href="${repo.html_url}/settings/pages">settings</a>` : null;
-        const links = [repoLink, actionsLink, bookLink, converterLink, settingsLink].filter(l => l !== null).join(' | ');
+          const repoLink = `<a href="${repo.html_url}">repo</a>`;
+          const actionsLink = `<a href="${repo.html_url}/actions">actions</a>`;
+          const bookLink = repo.has_pages && book ? `<a href="${pagesLink}">book</a>` : null;
+          const converterLink = repo.has_pages && converter ? `<a href="${converter}"">converter</a>` : null;
+          const settingsLink = !repo.has_pages ? `pages not set up in <a href="${repo.html_url}/settings/pages">settings</a>` : null;
+          const links = [repoLink, actionsLink, bookLink, converterLink, settingsLink].filter(l => l !== null).join(' | ');
 
-        return `
+          return `
 <div class="repo ${book ? 'book' : ''}">
-    <h2>${book ? `${book.author}: ${book.title}` : repo.name}</h2>
-    ${book ? `<p>books-are-next/${repo.name}</p>` : ''}
-    <p>${links}</p>
-</div>`;   
-    }));
+  <h2>${book ? `${book.author}: ${book.title}` : repo.name}</h2>
+  ${book ? `<p>books-are-next/${repo.name}</p>` : ''}
+  <p>${links}</p>
+</div>`;
+        }));
 
-    document.getElementById('content').innerHTML = info.join('');
-})
-</script>
+      if (info.length > 0) document.getElementById('content').innerHTML = document.getElementById('content').innerHTML + info.join('');  
+      if (info.length > 95) loadPage(page + 1);
+    })
+  };
+
+  loadPage(1);
+  </script>
 </body>
+
 </html>
