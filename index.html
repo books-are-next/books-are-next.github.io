@@ -31,9 +31,7 @@
 
 <body>
   <h1>BooksAreNext repositories</h1>
-  <div id="content">
-    <p>Loading…</p>
-  </div>
+  <div id="content"></div>
   <script>
   function loadPage(page) {
     fetch(`https://api.github.com/orgs/books-are-next/repos?page=${page}&per_page=100`).then(response => response.json()).then(async data => {
