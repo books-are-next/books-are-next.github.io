@@ -67,12 +67,13 @@
           const bookLink = repo.has_pages && book ? `<a href="${pagesLink}">book</a>` : null;
           const converterLink = repo.has_pages && converter ? `<a href="${converter}"">converter</a>` : null;
           const settingsLink = !repo.has_pages ? `pages not set up in <a href="${repo.html_url}/settings/pages">settings</a>` : null;
+          const badge = `<img src="https://github.com/books-are-next/${repo.name}/actions/workflows/publish.yml/badge.svg">`;
           const links = [repoLink, actionsLink, bookLink, converterLink, settingsLink].filter(l => l !== null).join(' | ');
 
           return `
 <div class="repo ${book ? 'book' : ''}">
   <h2>${book ? `${book.author}: ${book.title}` : repo.name}</h2>
-  ${book ? `<p>books-are-next/${repo.name} <img src="https://github.com/books-are-next/${repo.name}/actions/workflows/publish.yml/badge.svg"></p>` : ''}
+  ${book ? `<p>books-are-next/${repo.name}<br>${badge}</p>` : ''}
   <p>${links}</p>
 </div>`;
         }));
