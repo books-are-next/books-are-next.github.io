@@ -72,7 +72,7 @@
           return `
 <div class="repo ${book ? 'book' : ''}">
   <h2>${book ? `${book.author}: ${book.title}` : repo.name}</h2>
-  ${book ? `<p>books-are-next/${repo.name}</p>` : ''}
+  ${book ? `<p>books-are-next/${repo.name} <img src="https://github.com/books-are-next/${repo.name}/actions/workflows/publish.yml/badge.svg"></p>` : ''}
   <p>${links}</p>
 </div>`;
         }));
