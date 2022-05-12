@@ -72,8 +72,9 @@
 
           return `
 <div class="repo ${book ? 'book' : ''}">
+  ${book ? badge : ''}
   <h2>${book ? `${book.author}: ${book.title}` : repo.name}</h2>
-  ${book ? `<p>books-are-next/${repo.name}<br>${badge}</p>` : ''}
+  ${book ? `<p>books-are-next/${repo.name}</p>` : ''}
   <p>${links}</p>
 </div>`;
         }));
