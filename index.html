@@ -5,11 +5,8 @@
   <meta charset="utf-8">
   <title>List of books</title>
   <style>
-  @media (prefers-color-scheme: dark) {
-    :root {
-      background-color: #223;
-      color: #ddd;
-    }
+  body {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   }
     
   #content {
@@ -30,11 +27,18 @@
   }
 
   .book {
-    border: 2px solid gray;
+    border: 1px solid gray;
     background: #fafafa;
   }
   
   @media (prefers-color-scheme: dark) {
+    :root {
+      background-color: #223;
+      color: #ddd;
+    }
+    
+    a { color: aqua }
+    a:visited { color: #D58DE0 }
     .book { background: #334; }  
   }
   </style>
