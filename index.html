@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="utf-8">
   <title>List of books</title>
@@ -11,7 +10,7 @@
     padding: 2rem;
   }
     
-  #content {
+  #book-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     grid-gap: 2rem;
@@ -22,15 +21,54 @@
     margin: 0 0 0.25rem;
   }
 
+  #total {
+    opacity: 0.5;
+  }
+
+  #alpha {
+    grid-column: 1/ -1;
+    display: flex;
+    padding: 0;
+    margin: 0 0 2rem;
+  }
+
+  #alpha li {
+    display: block;
+    list-style-type: none;
+    margin: 0 0.5rem 0 0;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  #alpha li:hover {
+    color: blue;
+  }
+
+  #alpha li::first-letter {
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
   .repo {
     border: 1px dashed blue;
     border-radius: 10px;
     padding: 1rem;
   }
 
-  .book {
+  .book, #search {
     border: 1px solid gray;
     background: #fafafa;
+  }
+
+  #search {
+    display: block;
+    float: right;
+    width: 15rem;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    height: 1.5rem;
+    border-radius: 4px;
   }
   
   @media (prefers-color-scheme: dark) {
@@ -41,68 +79,22 @@
     
     a { color: aqua }
     a:visited { color: #D58DE0 }
-    .book { background: #334; border-color: #99a; } 
+    .book, #search { background: #334; border-color: #99a; color: #ddd; } 
+    #alpha li:hover { color: aqua;}
   }
   </style>
 </head>
 
 <body>
-  <h1>BooksAreNext repositories</h1>
-  <div id="content"></div>
-  <script>
-  function loadPage(page) {
-    fetch(`https://api.github.com/orgs/books-are-next/repos?page=${page}&per_page=100`).then(response => response.json()).then(async data => {
-      const info = await Promise.all(
-        data.filter(repo => repo.name !== 'library' && repo.name !== 'books-are-next.github.io').map(async repo => {
-          var book = null;
-          var converter = null;
-          const pagesLink = `https://books-are-next.github.io/${repo.name}/`;
-
-          if (repo.has_pages) {
-            await fetch(pagesLink + 'manifest.json')
-              .then(resp => {
-                if (resp.status === 200) return resp.json();
-                else return null;
-              })
-              .then(manifest => {
-                if (manifest) book = manifest
-              });
-
-            await fetch(pagesLink + 'epub2nb-output/')
-              .then(resp => {
-                if (resp.status === 200) return true;
-                else return false;
-              })
-              .then(converterWorks => {
-                if (converterWorks) converter = pagesLink + 'epub2nb-output/'
-              });
-          }
-
-
-          const repoLink = `<a href="${repo.html_url}">repo</a>`;
-          const actionsLink = `<a href="${repo.html_url}/actions">actions</a>`;
-          const bookLink = repo.has_pages && book ? `<a href="${pagesLink}">book</a>` : null;
-          const converterLink = repo.has_pages && converter ? `<a href="${converter}"">converter</a>` : null;
-          const settingsLink = !repo.has_pages ? `pages not set up in <a href="${repo.html_url}/settings/pages">settings</a>` : null;
-          const badge = `<img src="https://github.com/books-are-next/${repo.name}/actions/workflows/publish.yml/badge.svg">`;
-          const links = [repoLink, actionsLink, bookLink, converterLink, settingsLink].filter(l => l !== null).join(' | ');
-
-          return `
-<div class="repo ${book ? 'book' : ''}">
-  ${book ? badge : ''}
-  <h2>${book ? `${book.author}: ${book.title}` : repo.name}</h2>
-  ${book ? `<p>books-are-next/${repo.name}</p>` : ''}
-  <p>${links}</p>
-</div>`;
-        }));
-
-      if (info.length > 0) document.getElementById('content').innerHTML = document.getElementById('content').innerHTML + info.join('');  
-      if (info.length > 95) loadPage(page + 1);
-    })
-  };
-
-  loadPage(1);
-  </script>
+  <input type="text" id="search" placeholder="Search">
+  <h1>BooksAreNext repositories <span id="total"></span></h1>
+  <div id="content">
+    <ul id="alpha">
+      
+    </ul>
+    <div id="book-list"></div>
+  </div>
+  <script src="app.js"></script>
 </body>
 
 </html>
