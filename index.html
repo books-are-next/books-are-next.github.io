@@ -35,13 +35,20 @@
   #alpha li {
     display: block;
     list-style-type: none;
-    margin: 0 0.5rem 0 0;
+    padding: 0 2px;
+    margin: 0 0.5rem 0 -2px;
     font-size: 0.8rem;
     cursor: pointer;
+    border: 1px solid transparent;
   }
 
   #alpha li:hover {
     color: blue;
+  }
+
+  #alpha li.selected {
+    border: 1px solid #ccc;
+    border-radius: 2px;
   }
 
   #alpha li::first-letter {
@@ -100,6 +107,7 @@
     a:visited { color: #D58DE0 }
     .book, #search { background: #334; border-color: #99a; color: #ddd; } 
     #alpha li:hover { color: aqua;}
+    #alpha li.selected { color: #ddd }
   }
   </style>
 </head>

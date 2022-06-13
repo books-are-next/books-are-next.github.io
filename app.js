@@ -20,11 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
   loadData(1);
 
   alpha.addEventListener("click", (event) => {
-    renderRepos(
-      allRepos.filter(
-        (repo) => repo.name.substring(0, 1) === event.target.dataset.char
-      )
-    );
+    const target = event.target;
+    const char = target.dataset.char;
+
+    [...alpha.querySelectorAll("li")].forEach((el) => {
+      el.classList.remove("selected");
+    });
+    target.classList.add("selected");
+
+    renderRepos(allRepos.filter((repo) => repo.name.substring(0, 1) === char));
   });
 
   search.addEventListener(
