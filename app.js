@@ -4,6 +4,7 @@ const bookList = document.getElementById("book-list");
 const alpha = document.getElementById("alpha");
 const total = document.getElementById("total");
 const search = document.getElementById("search");
+const refresh = document.getElementById("refresh");
 
 function debounce(func, timeout = 300) {
   let timer;
@@ -35,6 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
       renderRepos(allRepos.filter((repo) => regex.test(repo.name)));
     })
   );
+
+  refresh.addEventListener("click", clearCache);
 });
 
 async function renderRepos(repos) {
@@ -104,6 +107,8 @@ async function renderRepo(repo) {
 function addLoaded(repos) {
   allRepos.push(...repos);
 
+  cacheRepos(repos);
+
   repos.forEach((repo) => {
     const initial = repo.name.substring(0, 1);
     if (!index[initial]) index[initial] = [];
@@ -113,9 +118,54 @@ function addLoaded(repos) {
   rerenderIndex();
 }
 
+function clearCache() {
+  localStorage.removeItem("all-repos");
+
+  allRepos.splice(0, allRepos.length);
+
+  for (var key in index) {
+    if (index.hasOwnProperty(key)) {
+      delete index[key];
+    }
+  }
+
+  loadData(1);
+}
+
+function getCached() {
+  const cached = localStorage.getItem("all-repos");
+
+  return cached ? JSON.parse(cached) : null;
+}
+
+function cacheRepos(repos) {
+  const cached = getCached();
+
+  const all = cached ? cached : [];
+  all.push(...repos);
+  localStorage.setItem("all-repos", JSON.stringify(all));
+}
+
 function loadData(page) {
+  if (page === 1) {
+    refresh.classList.add("rotating");
+    const cached = getCached();
+    if (cached) {
+      allRepos.push(...cached);
+      cached.forEach((repo) => {
+        const initial = repo.name.substring(0, 1);
+        if (!index[initial]) index[initial] = [];
+        index[initial].push(repo);
+      });
+
+      rerenderIndex();
+      return;
+    }
+  }
+
   fetch(
-    `https://api.github.com/orgs/books-are-next/repos?page=${page}&per_page=100`
+    `https://api.github.com/orgs/books-are-next/repos?page=${page}&per_page=100`,
+    { cache: "no-store" }
   )
     .then((response) => response.json())
     .then(async (data) => {
@@ -132,5 +182,6 @@ function loadData(page) {
         document.getElementById("content").innerHTML =
           document.getElementById("content").innerHTML + info.join("");*/
       if (info.length > 95) loadData(page + 1);
+      else refresh.classList.remove("rotating");
     });
 }

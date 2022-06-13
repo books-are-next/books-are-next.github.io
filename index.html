@@ -70,6 +70,25 @@
     height: 1.5rem;
     border-radius: 4px;
   }
+
+  @keyframes rotating {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  #refresh {
+    display: inline-block;
+    cursor: pointer;
+    transform-origin: 50% 50%;
+
+    .loading {
+      animation: rotating 2s linear infinite;
+    }
+  }
   
   @media (prefers-color-scheme: dark) {
     :root {
@@ -87,7 +106,7 @@
 
 <body>
   <input type="text" id="search" placeholder="Search">
-  <h1>BooksAreNext repositories <span id="total"></span></h1>
+  <h1>BooksAreNext repositories <span id="total"></span> <span id="refresh">🔄</span></h1>
   <div id="content">
     <ul id="alpha">
       
