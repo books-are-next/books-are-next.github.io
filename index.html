@@ -61,6 +61,7 @@
     border: 1px dashed blue;
     border-radius: 10px;
     padding: 1rem;
+    overflow: hidden;
   }
 
   .book, #search {
@@ -96,6 +97,19 @@
       animation: rotating 2s linear infinite;
     }
   }
+
+  .show-covers {
+    font-size: 1rem;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+
+  .cover-image {
+    max-width: calc(100% + 2rem);
+    display: block;
+    margin: -1rem -1rem 1rem;
+  }
+
   
   @media (prefers-color-scheme: dark) {
     :root {
@@ -105,7 +119,7 @@
     
     a { color: aqua }
     a:visited { color: #D58DE0 }
-    .book, #search { background: #334; border-color: #99a; color: #ddd; } 
+    .book, #search { background: #334; border-color: #002; color: #ddd; } 
     #alpha li:hover { color: aqua;}
     #alpha li.selected { color: #ddd }
   }
@@ -114,7 +128,12 @@
 
 <body>
   <input type="text" id="search" placeholder="Search">
-  <h1>BooksAreNext repositories <span id="total"></span> <span id="refresh">🔄</span></h1>
+  <h1>
+    BooksAreNext repositories 
+    <span id="total"></span> 
+    <span id="refresh">🔄</span> 
+    <label class="show-covers"><input type="checkbox" id="covers"> show covers</label>
+  </h1>
   <div id="content">
     <ul id="alpha">
       

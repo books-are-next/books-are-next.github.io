@@ -1,10 +1,13 @@
 const allRepos = [];
+let filteredRepos = [];
 const index = {};
+let showCovers = false;
 const bookList = document.getElementById("book-list");
 const alpha = document.getElementById("alpha");
 const total = document.getElementById("total");
 const search = document.getElementById("search");
 const refresh = document.getElementById("refresh");
+const covers = document.getElementById("covers");
 
 function debounce(func, timeout = 300) {
   let timer;
@@ -42,10 +45,21 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 
   refresh.addEventListener("click", clearCache);
+
+  covers.addEventListener("input", (event) => {
+    showCovers = event.target.checked;
+    rerenderRepos();
+  });
 });
 
-async function renderRepos(repos) {
-  const rendered = await Promise.all(repos.map(renderRepo));
+function renderRepos(repos) {
+  console.log(repos);
+  filteredRepos = [...repos];
+  rerenderRepos();
+}
+
+async function rerenderRepos() {
+  const rendered = await Promise.all(filteredRepos.map(renderRepo));
   bookList.innerHTML = rendered.join("");
 }
 
@@ -63,49 +77,60 @@ async function renderRepo(repo) {
   var converter = null;
   const pagesLink = `https://books-are-next.github.io/${repo.name}/`;
 
-  if (repo.has_pages) {
-    await fetch(pagesLink + "manifest.json")
-      .then((resp) => {
-        if (resp.status === 200) return resp.json();
-        else return null;
-      })
-      .then((manifest) => {
-        if (manifest) book = manifest;
-      });
+  try {
+    if (repo.has_pages) {
+      await fetch(pagesLink + "manifest.json")
+        .then((resp) => {
+          if (resp.status === 200) return resp.json();
+          else return null;
+        })
+        .then((manifest) => {
+          if (manifest) book = manifest;
+        });
 
-    await fetch(pagesLink + "epub2nb-output/")
-      .then((resp) => {
-        if (resp.status === 200) return true;
-        else return false;
-      })
-      .then((converterWorks) => {
-        if (converterWorks) converter = pagesLink + "epub2nb-output/";
-      });
-  }
+      await fetch(pagesLink + "epub2nb-output/")
+        .then((resp) => {
+          if (resp.status === 200) return true;
+          else return false;
+        })
+        .then((converterWorks) => {
+          if (converterWorks) converter = pagesLink + "epub2nb-output/";
+        });
+    }
 
-  const repoLink = `<a href="${repo.html_url}">repo</a>`;
-  const actionsLink = `<a href="${repo.html_url}/actions">actions</a>`;
-  const bookLink =
-    repo.has_pages && book ? `<a href="${pagesLink}">book</a>` : null;
-  const converterLink =
-    repo.has_pages && converter
-      ? `<a href="${converter}"">converter</a>`
+    const repoLink = `<a href="${repo.html_url}">repo</a>`;
+    const actionsLink = `<a href="${repo.html_url}/actions">actions</a>`;
+    const coverImg =
+      repo.has_pages && book
+        ? `<img class="cover-image" src="${
+            pagesLink + "assets/cover-1200x1200.png"
+          }">`
+        : null;
+    const bookLink =
+      repo.has_pages && book ? `<a href="${pagesLink}">book</a>` : null;
+    const converterLink =
+      repo.has_pages && converter
+        ? `<a href="${converter}"">converter</a>`
+        : null;
+    const settingsLink = !repo.has_pages
+      ? `pages not set up in <a href="${repo.html_url}/settings/pages">settings</a>`
       : null;
-  const settingsLink = !repo.has_pages
-    ? `pages not set up in <a href="${repo.html_url}/settings/pages">settings</a>`
-    : null;
-  const badge = `<img src="https://github.com/books-are-next/${repo.name}/actions/workflows/publish.yml/badge.svg">`;
-  const links = [repoLink, actionsLink, bookLink, converterLink, settingsLink]
-    .filter((l) => l !== null)
-    .join(" | ");
+    const badge = `<img src="https://github.com/books-are-next/${repo.name}/actions/workflows/publish.yml/badge.svg">`;
+    const links = [repoLink, actionsLink, bookLink, converterLink, settingsLink]
+      .filter((l) => l !== null)
+      .join(" | ");
 
-  return `
+    return `
 <div class="repo ${book ? "book" : ""}">
+  ${showCovers ? coverImg : ""}
   ${book ? badge : ""}
   <h2>${book ? `${book.author}: ${book.title}` : repo.name}</h2>
   ${book ? `<p>books-are-next/${repo.name}</p>` : ""}
   <p>${links}</p>
 </div>`;
+  } catch {
+    return "";
+  }
 }
 
 function addLoaded(repos) {
