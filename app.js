@@ -105,7 +105,7 @@ async function renderRepo(repo) {
         ? `<img class="cover-image" src="${
             pagesLink + "assets/cover-1200x1200.png"
           }">`
-        : null;
+        : "";
     const bookLink =
       repo.has_pages && book ? `<a href="${pagesLink}">book</a>` : null;
     const converterLink =
