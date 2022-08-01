@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>List of books</title>
+  <style>
+  body {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+    margin: 0;
+    padding: 2rem;
+  }
+    
+  #book-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-gap: 2rem;
+  }
+
+  h2,
+  p {
+    margin: 0 0 0.25rem;
+  }
+
+  #total {
+    opacity: 0.5;
+  }
+
+  #alpha {
+    grid-column: 1/ -1;
+    display: flex;
+    padding: 0;
+    margin: 0 0 2rem;
+  }
+
+  #alpha li {
+    display: block;
+    list-style-type: none;
+    padding: 0 2px;
+    margin: 0 0.5rem 0 -2px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  #alpha li:hover {
+    color: blue;
+  }
+
+  #alpha li.selected {
+    border: 1px solid #ccc;
+    border-radius: 2px;
+  }
+
+  #alpha li::first-letter {
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .repo {
+    border: 1px dashed blue;
+    border-radius: 10px;
+    padding: 1rem;
+    overflow: hidden;
+  }
+
+  .book, #search {
+    border: 1px solid gray;
+    background: #fafafa;
+  }
+
+  #search {
+    display: block;
+    float: right;
+    width: 15rem;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+    height: 1.5rem;
+    border-radius: 4px;
+  }
+
+  @keyframes rotating {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  #refresh {
+    display: inline-block;
+    cursor: pointer;
+    transform-origin: 50% 50%;
+
+    .loading {
+      animation: rotating 2s linear infinite;
+    }
+  }
+
+  .show-covers {
+    font-size: 1rem;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+
+  .cover-image {
+    max-width: calc(100% + 2rem);
+    display: block;
+    margin: -1rem -1rem 1rem;
+  }
+
+  
+  @media (prefers-color-scheme: dark) {
+    :root {
+      background-color: #223;
+      color: #ddd;
+    }
+    
+    a { color: aqua }
+    a:visited { color: #D58DE0 }
+    .book, #search { background: #334; border-color: #002; color: #ddd; } 
+    #alpha li:hover { color: aqua;}
+    #alpha li.selected { color: #ddd }
+  }
+  </style>
+</head>
+
+<body>
+  <h1>
+    BooksAreNext covers 
+    <span id="total"></span> 
+    <span id="refresh">🔄</span>
+  </h1>
+  <div id="content">
+    <div id="book-list"></div>
+  </div>
+  <script src="covers.js"></script>
+</body>
+
+</html>
